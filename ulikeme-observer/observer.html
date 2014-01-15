@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>uLikeMe (on Facebook)</title>
+  <meta name="description" content="uLikeMe (on Facebook) is an app for allowing other people to love you (on Facebook)">
+  <link href='http://fonts.googleapis.com/css?family=Lato:100,300,400,700' rel='stylesheet' type='text/css'>
+  <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700,800' rel='stylesheet' type='text/css'>
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+
+  <meta property="og:title" content="uLikeMe (on Facebook)" />
+  <meta property="og:type" content="article" />
+  <!--
+  <meta property="og:url" content="http://www.thiagohersan.com/uLikeMe/" />
+  <meta property="og:image" content="http://www.thiagohersan.com/uLikeMe/imgs/receipt180.png" />
+  -->
+  <meta property="og:description" content="uLikeMe (on Facebook) is an app for allowing other people to love you (on Facebook)" />
+
+  <script>
+  var host = (typeof DEBUG !== 'undefined')?"ws://localhost:5000/observer":"ws://ulikeme-server.herokuapp.com/observer";
+  var ws = new WebSocket(host);
+  ws.onmessage = function (event) {
+    if('data' in event){
+      var data = JSON.parse(event.data);
+      if('clientIds' in data){
+        var clientIds = data['clientIds'];
+        /* TODO: 
+            1. make client selector
+        */
+        console.log(clientIds);
+      }
+    }
+    /* TODO: if client response:
+        1. post something to FB
+    */
+  };
+  </script>
+
+</head>
+<body>
+</body>
+</html>
