@@ -1,0 +1,3 @@
+[submodule "ulikeme-server"]
+	path = ulikeme-server
+	url = git@github.com:thiagohersan/ulikeme-server.git
