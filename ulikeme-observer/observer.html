@@ -15,30 +15,12 @@
   <meta property="og:image" content="http://www.thiagohersan.com/uLikeMe/imgs/uLikeMe500.png" />
   <meta property="og:description" content="uLikeMe (on Facebook) is an app for allowing other people to love you (on Facebook)" />
 
-  <script>
-  var host = (typeof DEBUG !== 'undefined')?"ws://localhost:5000/observer":"ws://ulikeme-server.herokuapp.com/observer";
-  var ws = new WebSocket(host);
-  ws.onmessage = function (event) {
-    if('data' in event){
-      var data = JSON.parse(event.data);
-      if('clientIds' in data){
-        var clientIds = data['clientIds'];
-        /* TODO:
-            1. make client selector
-        */
-        console.log(clientIds);
-      }
-    }
-    /* TODO: if client response:
-        1. post something to FB
-    */
-  };
-  </script>
 </head>
 <body>
   <div id="fb-root"></div>
   <script>
 
+  var myWebSocket;
   // Load the SDK asynchronously
   (function(d){
     var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
@@ -69,8 +51,23 @@
   }
   function onLogIn(response) {
     if(('status' in response) && (response.status == 'connected')){
-      // TODO: connect to heroku app, get list of clients
-      console.log('connected');
+      // connect to heroku app, get list of clients
+      myWebSocket = new WebSocket("ws://ulikeme-server.herokuapp.com/observer");
+      myWebSocket.onmessage = function (event) {
+        if('data' in event){
+          var data = JSON.parse(event.data);
+          if('clientIds' in data){
+            var clientIds = data['clientIds'];
+            /* TODO:
+              1. make client selector
+            */
+            console.log(clientIds);
+          }
+        }
+        /* TODO: if client response:
+          1. post something to FB
+        */
+      };
     }
   }
 
