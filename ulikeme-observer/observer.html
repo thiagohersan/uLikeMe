@@ -47,7 +47,7 @@
   };
 
   function logMeIn(){
-    FB.login(onLogIn, {scope: "read_stream,user_likes,publish_actions,publish_stream,user_likes"});
+    FB.login(function(){}, {scope: "read_stream,user_likes,publish_actions,publish_stream"});
   }
   function onLogIn(response) {
     if(('status' in response) && (response.status == 'connected')){
@@ -64,20 +64,19 @@
             console.log(clientIds);
           }
         }
-        /* TODO: if client response:
-          1. post something to FB
+        /* TODO: on client info request response:
+          1. post something to FB ??
         */
       };
     }
   }
 
-  $(document).ready(function(){
+  $(window).load(function(){
     $('#roll-over-area').hover(
       function(){ $('#eye-img').attr("src","imgs/uLikeMe666.png"); },
       function() { $('#eye-img').attr("src","imgs/uLikeMe666_.png"); }
       );
   });
-
   </script>
 
   <div id="main-body">
