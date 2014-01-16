@@ -12,6 +12,12 @@
   var myId = "1234567";
   var host = (typeof DEBUG !== 'undefined')?"ws://localhost:5000/client?id="+myId:"ws://ulikeme-server.herokuapp.com/client?id="+myId;
   var ws = new WebSocket(host);
+
+  // ping keep alive
+  ws.onopen = function(){
+    setInterval(function(){ console.log("PING"); ws.send("PING"); }, 10000);
+  };
+
   ws.onmessage = function (event) {
     /* TODO: if info request:
         1. parse observer id
