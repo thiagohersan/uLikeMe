@@ -7,6 +7,7 @@
   <link href='http://fonts.googleapis.com/css?family=Lato:100,300,400,700' rel='stylesheet' type='text/css'>
   <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700,800' rel='stylesheet' type='text/css'>
   <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="css.css" />
 
   <meta property="og:title" content="uLikeMe (on Facebook)" />
   <meta property="og:type" content="article" />
@@ -22,7 +23,7 @@
       var data = JSON.parse(event.data);
       if('clientIds' in data){
         var clientIds = data['clientIds'];
-        /* TODO: 
+        /* TODO:
             1. make client selector
         */
         console.log(clientIds);
@@ -33,8 +34,80 @@
     */
   };
   </script>
-
 </head>
 <body>
+  <div id="fb-root"></div>
+  <script>
+
+  // Load the SDK asynchronously
+  (function(d){
+    var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
+    if (d.getElementById(id)) {return;}
+    js = d.createElement('script'); js.id = id; js.async = true;
+    js.src = "//connect.facebook.net/en_US/all.js";
+    ref.parentNode.insertBefore(js, ref);
+  }(document));
+
+  window.fbAsyncInit = function() {
+    FB.init({
+      appId      : '499753440145658',
+      status     : true, // check login status
+      cookie     : true, // enable cookies to allow the server to access the session
+      xfbml      : true  // parse XFBML
+    });
+
+    FB.Event.subscribe('auth.authResponseChange', function(response) {
+      if (response.status == 'connected') {
+        myId = response.authResponse.userID;
+        onLogIn(response);
+      }
+    });
+  };
+
+  function logMeIn(){
+    FB.login(onLogIn, {scope: "read_stream,user_likes,publish_actions,publish_stream,user_likes"});
+  }
+  function onLogIn(response) {
+    if(('status' in response) && (response.status == 'connected')){
+      // TODO: connect to heroku app, get list of clients
+      console.log('connected');
+    }
+  }
+
+  $(document).ready(function(){
+    $('#roll-over-area').hover(
+      function(){ $('#eye-img').attr("src","imgs/uLikeMe666.png"); },
+      function() { $('#eye-img').attr("src","imgs/uLikeMe666_.png"); }
+      );
+  });
+
+  </script>
+
+  <div id="main-body">
+    <div id="logo-button">
+      <img id="eye-img" src="imgs/uLikeMe666_.png" usemap="#imgmap" />
+      <map name="imgmap">
+        <area id="roll-over-area" shape="circle" coords="333,333,166" onclick="logMeIn()" >
+      </map>
+    </div>
+  </div>
+
+  <div class="fb-like"
+    id="fb-like"
+    data-href="http://www.thiagohersan.com/uLikeMe"
+    data-layout="box_count"
+    data-action="like"
+    data-show-faces="false"
+    data-share="false">
+  </div>
+
+  <div id="about" class="bottom-links">
+    <a href="http://www.thiagohersan.com/project/ilikeyou-on-facebook-2013/" target="_about">Info</a>
+  </div>
+
+  <div id="credit" class="bottom-links">
+    <a href="http://www.thiagohersan.com/" target="_credit">Thiago Hersan</a>
+  </div>
+
 </body>
 </html>

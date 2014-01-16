@@ -1,0 +1,56 @@
+body {
+	background:#3B5998;
+	padding:0;
+	margin:0;
+	height:100%;
+	min-height:100%;
+	font-family: 'Lato', sans-serif;
+}
+
+#main-body {
+	width:100%;
+	text-align: center;
+	vertical-align: middle;
+	background-color: #3B5998;
+	overflow: scroll;
+}
+
+#logo-button {
+	margin: auto auto;
+	display: inline-block;
+	background-color: #3B5998;
+	text-align: center;
+	vertical-align: middle;
+}
+
+#fb-like {
+	position:fixed;
+	bottom:10px;
+	left:5px;
+}
+
+#credit {
+	position:fixed;
+	bottom:10px;
+	right:5px;
+}
+
+#about {
+	position:fixed;
+	bottom:10px;
+	left: 50%;
+}
+
+.bottom-links a {
+	color: #ffffff;
+	text-decoration: none;
+}
+
+.fb_iframe_widget_lift {
+	transition:all .5s;
+	margin-top:-333px;
+}
+
+.invisible{
+	display: none;
+}
