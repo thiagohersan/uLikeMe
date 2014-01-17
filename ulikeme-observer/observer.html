@@ -58,10 +58,14 @@
           var data = JSON.parse(event.data);
           if('clientIds' in data){
             var clientIds = data['clientIds'];
-            /* TODO:
-              1. make client selector
-            */
             console.log(clientIds);
+            /* client selector */
+            FB.ui({method: 'apprequests',
+              message: 'I got my eyes on you!',
+              title: 'I got my eyes on you!',
+              filters: [{name: 'I got my eyes on you!', user_ids: clientIds}],
+              max_recipients: 1
+            }, targetSelectorCallback);
           }
         }
         /* TODO: on client info request response:
@@ -69,6 +73,9 @@
         */
       };
     }
+  }
+  function targetSelectorCallback(pickerResponse){
+    // TODO: send request to server
   }
 
   $(window).load(function(){
