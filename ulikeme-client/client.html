@@ -7,20 +7,27 @@
   <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
 
   <script>
-  var myId = "1234567";
+  var myId = "680143124";
+  //var DEBUG = 1;
   var host = (typeof DEBUG !== 'undefined')?"ws://localhost:5000/client?id="+myId:"ws://ulikeme-server.herokuapp.com/client?id="+myId;
   var ws = new WebSocket(host);
 
   // ping keep alive
   ws.onopen = function(){ setInterval(function(){ console.log("PING"); ws.send("PING"); }, 10000); };
   ws.onmessage = function (event) {
-    /* TODO: if info request:
-        1. parse observer id
-        2. get info
-        3. post to FB
-        4. send something back to observer
-    */
+    if('data' in event){
+      var data = JSON.parse(event.data);
+      if('observer' in data){
+        console.log("got request from "+data['observer']);
+        /* TODO:
+          2. get info
+          3. post to FB
+          4. send something back to observer ??
+        */
+      }
+    }
   };
+
   </script>
 </head>
 <body>
