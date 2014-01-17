@@ -20,7 +20,8 @@
   <div id="fb-root"></div>
   <script>
 
-  var myWebSocket;
+  var myWebSocket, myId;
+
   // Load the SDK asynchronously
   (function(d){
     var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
@@ -53,6 +54,7 @@
     if(('status' in response) && (response.status == 'connected')){
       // connect to heroku app, get list of clients
       myWebSocket = new WebSocket("ws://ulikeme-server.herokuapp.com/observer");
+      myWebSocket.onopen = function(){ setInterval(function(){ console.log("PING"); ws.send("PING"); }, 10000); };
       myWebSocket.onmessage = function (event) {
         if('data' in event){
           var data = JSON.parse(event.data);
@@ -65,7 +67,7 @@
               title: 'I got my eyes on you!',
               filters: [{name: 'I got my eyes on you!', user_ids: clientIds}],
               max_recipients: 1
-            }, targetSelectorCallback);
+            }, clientSelectorCallback);
           }
         }
         /* TODO: on client info request response:
@@ -74,8 +76,11 @@
       };
     }
   }
-  function targetSelectorCallback(pickerResponse){
-    // TODO: send request to server
+  function clientSelectorCallback(pickerResponse){
+    // send request to server (should only be one, but just in case)
+    for(var i=0; (pickerResponse != null)&&('to' in pickerResponse)&&(i<pickerResponse.to.length); i++) {
+      myWebSocket.send(JSON.stringify({observer: myId, client: pickerResponse.to[i]}));
+    }
   }
 
   $(window).load(function(){
