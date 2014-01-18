@@ -5,16 +5,34 @@ from os import remove
 from re import match, sub
 from time import time, sleep
 from Queue import PriorityQueue
-from json import dumps
+from json import dumps, loads
 from xml.dom import minidom
 from urllib2 import urlopen
 from urllib import urlencode
 from urlparse import parse_qs, urlparse
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
+from ws4py.client.threadedclient import WebSocketClient
 from cv2 import cv
 from pyscreenshot import grab
 import webbrowser
 import facebook
+
+class uLikeMeWebSocketClient(WebSocketClient):
+    def opened(self):
+        print "WebSocket opened"
+
+    def closed(self, code, reason=None):
+        print "WebSocket closed: %s %s" %(code, reason)
+
+    def received_message(self, m):
+        data = loads(str(m))
+        if('observer' in data):
+            graph = graphs.queue[0]
+            print "got request from %s" % (data['observer'])
+            print "aka. %s" % graph.get_object(data['observer'])['name']
+            ## TODO:
+            ##     1. get info and post to FB (postPicture())
+            ##     2. send something back to observer ??
 
 def get_url(path, args=None):
     endpoint = 'graph.facebook.com'
@@ -66,28 +84,29 @@ def setupOneApp(secrets):
     return secrets['ACCESS_TOKEN']
 
 def loop():
-	pass
-
-def setup():
-    oauthDom = minidom.parse('./data/oauth.xml')
-    graphs = PriorityQueue()
-    for app in oauthDom.getElementsByTagName('app'):
-        secrets = {}
-        secrets['APP_ID'] = app.attributes['app_id'].value
-        secrets['APP_SECRET'] = app.attributes['app_secret'].value
-        graphs.put(facebook.GraphAPI(setupOneApp(secrets)))
-    return graphs
-    ## TODO: setup WebSocket
-
-def postPicture():
-    global userName, userId
+    global userName, userId, myWebSocket
     graph = graphs.queue[0]
     if (userName is None):
         userName = str(graph.get_object("me")['name'])
     if (userId is None):
         userId = int(graph.get_object("me")['id'])
-    message = "\"In the future, everyone will %s for 15 minutes.\"\n\n--%s"
-    message %= ('be there', userName)
+    if(myWebSocket is None):
+        host = 'ws://ulikeme-server.herokuapp.com/client?id=%s'%(userId)
+        myWebSocket = uLikeMeWebSocketClient(host, heartbeat_freq=10)
+        myWebSocket.connect()
+        myWebSocket.run_forever()
+
+def setup():
+    oauthDom = minidom.parse('./oauth.xml')
+    for app in oauthDom.getElementsByTagName('app'):
+        secrets = {}
+        secrets['APP_ID'] = app.attributes['app_id'].value
+        secrets['APP_SECRET'] = app.attributes['app_secret'].value
+        graphs.put(facebook.GraphAPI(setupOneApp(secrets)))
+
+def postPicture():
+    graph = graphs.queue[0]
+    message = "%s was looking at me ..." % ('observer')
 
     ## TODO: fix this
     cv.SaveImage('camera.png', cv.QueryFrame(cv.CaptureFromCAM(0)))
@@ -104,9 +123,11 @@ def postPicture():
     remove('screen.png')
 
 if __name__ == '__main__':
-    graphs = setup()
     userName = None
     userId = None
+    myWebSocket = None
+    graphs = PriorityQueue()
+    setup()
 
     try:
         while(True):
@@ -117,5 +138,7 @@ if __name__ == '__main__':
             if (loopTime < 0.016):
                 sleep(0.016 - loopTime)
         exit(0)
-    except KeyboardInterrupt :
+    except KeyboardInterrupt:
+        if(not myWebSocket is None):
+            myWebSocket.close()
         exit(0)
