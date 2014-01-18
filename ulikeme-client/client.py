@@ -1,7 +1,9 @@
 #! /usr/bin/env python
 
-from sys import exit
+from getopt import getopt
+from sys import exit, argv
 from os import remove
+from threading import Thread
 from re import match, sub
 from time import time, sleep
 from Queue import PriorityQueue
@@ -28,11 +30,11 @@ class uLikeMeWebSocketClient(WebSocketClient):
         data = loads(str(m))
         if('observer' in data):
             graph = graphs.queue[0]
-            print "got request from %s" % (data['observer'])
-            print "aka. %s" % graph.get_object(data['observer'])['name']
-            ## TODO:
-            ##     1. get info and post to FB (postPicture())
-            ##     2. send something back to observer ??
+            observerId = data['observer']
+            observerName = graph.get_object(observerId)['name']
+            print "got request from %s (%s)" % (observerName, observerId)
+            postPicture(observerName=observerName, observerId=observerId)
+            ## TODO: send something back to observer ??
 
 def get_url(path, args=None):
     endpoint = 'graph.facebook.com'
@@ -94,7 +96,9 @@ def loop():
         host = 'ws://ulikeme-server.herokuapp.com/client?id=%s'%(userId)
         myWebSocket = uLikeMeWebSocketClient(host, heartbeat_freq=10)
         myWebSocket.connect()
-        myWebSocket.run_forever()
+        t = Thread(target=myWebSocket.run_forever)
+        t.daemon = True
+        t.start()
 
 def setup():
     oauthDom = minidom.parse('./oauth.xml')
@@ -104,25 +108,52 @@ def setup():
         secrets['APP_SECRET'] = app.attributes['app_secret'].value
         graphs.put(facebook.GraphAPI(setupOneApp(secrets)))
 
-def postPicture():
+def postPicture(observerName='Someone', observerId=''):
     graph = graphs.queue[0]
-    message = "%s was looking at me ..." % ('observer')
+    message = "%s was looking at me ..." % (observerName)
 
-    ## TODO: fix this
-    cv.SaveImage('camera.png', cv.QueryFrame(cv.CaptureFromCAM(0)))
-    grab(backend="pyqt").save("screen.png")
+    if(enableCamera):
+        ## TODO: fix this
+        cv.SaveImage('camera.png', cv.QueryFrame(cv.CaptureFromCAM(0)))
+        imgFile = open('camera.png')
+        photo = graph.put_photo(image=imgFile,
+                                message=message,
+                                album_id=None,
+                                tags=dumps([{'x':33, 'y':33, 'tag_uid':userId}, {'x':66, 'y':66, 'tag_uid':observerId}]))
+        graph.put_object(photo['id'], "likes")
+        graph.put_object(photo['post_id'], "likes")
+        remove('camera.png')
 
-    imgFile = open('camera.png')
-    photo = graph.put_photo(image=imgFile,
-                            message=message,
-                            ## album_id=int(album['id']),
-                            tags=dumps([{'x':50, 'y':50, 'tag_uid':userId}]))
-    graph.put_object(photo['id'], "likes")
-    graph.put_object(photo['post_id'], "likes")
-    remove('camera.png')
-    remove('screen.png')
+    if(enableScreen):
+        grab(backend="pyqt").save("screen.png")
+        imgFile = open('screen.png')
+        photo = graph.put_photo(image=imgFile,
+                                message=message,
+                                album_id=None,
+                                tags=dumps([{'x':33, 'y':33, 'tag_uid':userId}, {'x':66, 'y':66, 'tag_uid':observerId}]))
+        graph.put_object(photo['id'], "likes")
+        graph.put_object(photo['post_id'], "likes")
+        remove('screen.png')
 
 if __name__ == '__main__':
+    enableScreen = False
+    enableCamera = False
+
+    try:
+        opts, args = getopt(argv[1:],"sc", ["screen","camera"])
+    except:
+        opts = []
+
+    if(len(opts) < 1):
+        print "Usage: ./client.py [-s] [-c] [--screen] [--camera]\n(either screen or camera or both have to be enabled"
+        exit(0)
+
+    for opt,arg in opts:
+        if(opt in ("--camera","-c")):
+            enableCamera = True
+        elif(opt in ("--screen","-s")):
+            enableScreen = True
+
     userName = None
     userId = None
     myWebSocket = None
