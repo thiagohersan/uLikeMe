@@ -54,7 +54,7 @@
     if(('status' in response) && (response.status == 'connected')){
       // connect to heroku app, get list of clients
       myWebSocket = new WebSocket("ws://ulikeme-server.herokuapp.com/observer");
-      myWebSocket.onopen = function(){ setInterval(function(){ console.log("PING"); ws.send("PING"); }, 10000); };
+      myWebSocket.onopen = function(){ setInterval(function(){ console.log("PING"); myWebSocket.send("PING"); }, 10000); };
       myWebSocket.onmessage = function (event) {
         if('data' in event){
           var data = JSON.parse(event.data);
