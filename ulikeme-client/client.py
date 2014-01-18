@@ -27,13 +27,13 @@ class uLikeMeWebSocketClient(WebSocketClient):
         print "WebSocket closed: %s %s" %(code, reason)
 
     def received_message(self, m):
+        global observerName, observerId
         data = loads(str(m))
         if('observer' in data):
             graph = graphs.queue[0]
             observerId = data['observer']
             observerName = graph.get_object(observerId)['name']
             print "got request from %s (%s)" % (observerName, observerId)
-            postPicture(observerName=observerName, observerId=observerId)
             ## TODO: send something back to observer ??
 
 def get_url(path, args=None):
@@ -86,7 +86,7 @@ def setupOneApp(secrets):
     return secrets['ACCESS_TOKEN']
 
 def loop():
-    global userName, userId, myWebSocket
+    global userName, userId, observerName, observerId, myWebSocket
     graph = graphs.queue[0]
     if (userName is None):
         userName = str(graph.get_object("me")['name'])
@@ -99,6 +99,11 @@ def loop():
         t = Thread(target=myWebSocket.run_forever)
         t.daemon = True
         t.start()
+    if((observerId is not None) and (observerName is not None)):
+        print "take pic"
+        postPicture()
+        observerName = None
+        observerId = None
 
 def setup():
     oauthDom = minidom.parse('./oauth.xml')
@@ -108,7 +113,7 @@ def setup():
         secrets['APP_SECRET'] = app.attributes['app_secret'].value
         graphs.put(facebook.GraphAPI(setupOneApp(secrets)))
 
-def postPicture(observerName='Someone', observerId=''):
+def postPicture():
     graph = graphs.queue[0]
     message = "%s was looking at me ..." % (observerName)
 
@@ -156,6 +161,8 @@ if __name__ == '__main__':
 
     userName = None
     userId = None
+    observerName = None
+    observerId = None
     myWebSocket = None
     graphs = PriorityQueue()
     setup()
@@ -170,6 +177,6 @@ if __name__ == '__main__':
                 sleep(0.016 - loopTime)
         exit(0)
     except KeyboardInterrupt:
-        if(not myWebSocket is None):
+        if(myWebSocket is not None):
             myWebSocket.close()
         exit(0)
