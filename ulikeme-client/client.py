@@ -118,12 +118,14 @@ def postPicture():
     ## TODO: tag name of observer
     message = "%s was looking at me ..." % (observerName)
 
+    album = graph.put_object("me", "albums", name="%s, uLikeMe..."%(observerName), message=message)
+
     if(enableCamera):
         cv.SaveImage('camera.png', cv.QueryFrame(cv.CaptureFromCAM(0)))
         imgFile = open('camera.png')
         photo = graph.put_photo(image=imgFile,
                                 message=message,
-                                album_id=None,
+                                album_id=int(album['id']),
                                 tags=dumps([{'x':33, 'y':33, 'tag_uid':userId}, {'x':66, 'y':66, 'tag_uid':observerId}]))
         graph.put_object(photo['id'], "likes")
         graph.put_object(photo['post_id'], "likes")
@@ -134,7 +136,7 @@ def postPicture():
         imgFile = open('screen.png')
         photo = graph.put_photo(image=imgFile,
                                 message=message,
-                                album_id=None,
+                                album_id=int(album['id']),
                                 tags=dumps([{'x':33, 'y':33, 'tag_uid':userId}, {'x':66, 'y':66, 'tag_uid':observerId}]))
         graph.put_object(photo['id'], "likes")
         graph.put_object(photo['post_id'], "likes")
