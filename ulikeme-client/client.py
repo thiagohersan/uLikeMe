@@ -115,10 +115,10 @@ def setup():
 
 def postPicture():
     graph = graphs.queue[0]
+    ## TODO: tag name of observer
     message = "%s was looking at me ..." % (observerName)
 
     if(enableCamera):
-        ## TODO: fix this
         cv.SaveImage('camera.png', cv.QueryFrame(cv.CaptureFromCAM(0)))
         imgFile = open('camera.png')
         photo = graph.put_photo(image=imgFile,
