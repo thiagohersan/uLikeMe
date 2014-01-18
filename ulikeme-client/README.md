@@ -9,5 +9,4 @@ Dependencies:
 - [PyScreenshot](http://ponty.github.io/pyscreenshot/readme.html)
 - [OpenCV](http://docs.opencv.org/trunk/doc/py_tutorials/py_tutorials.html)
 - [Facebook Python SDK](https://github.com/pythonforfacebook/facebook-sdk)
-- [websocket-client](https://github.com/liris/websocket-client)
 - [ws4py](https://ws4py.readthedocs.org)
