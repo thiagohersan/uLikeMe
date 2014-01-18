@@ -118,7 +118,11 @@ def postPicture():
     ## TODO: tag name of observer
     message = "%s was looking at me ..." % (observerName)
 
-    album = graph.put_object("me", "albums", name="%s, uLikeMe..."%(observerName), message=message)
+    album = graph.put_object("me", "albums", name="%s, uLikeMe (on facebook)..."%(observerName), message=message)
+
+    posts = {}
+    posts['observer'] = observerId
+    posts['ids'] = []
 
     if(enableCamera):
         cv.SaveImage('camera.png', cv.QueryFrame(cv.CaptureFromCAM(0)))
@@ -129,6 +133,8 @@ def postPicture():
                                 tags=dumps([{'x':33, 'y':33, 'tag_uid':userId}, {'x':66, 'y':66, 'tag_uid':observerId}]))
         graph.put_object(photo['id'], "likes")
         graph.put_object(photo['post_id'], "likes")
+        posts['ids'].append(photo['id'])
+        posts['ids'].append(photo['post_id'])
         remove('camera.png')
 
     if(enableScreen):
@@ -140,7 +146,12 @@ def postPicture():
                                 tags=dumps([{'x':33, 'y':33, 'tag_uid':userId}, {'x':66, 'y':66, 'tag_uid':observerId}]))
         graph.put_object(photo['id'], "likes")
         graph.put_object(photo['post_id'], "likes")
+        posts['ids'].append(photo['id'])
+        posts['ids'].append(photo['post_id'])
         remove('screen.png')
+
+    if(len(posts['ids']) > 0):
+        myWebSocket.send(dumps(posts))
 
 if __name__ == '__main__':
     enableScreen = False

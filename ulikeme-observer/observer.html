@@ -53,14 +53,13 @@
   function onLogIn(response) {
     if(('status' in response) && (response.status == 'connected')){
       // connect to heroku app, get list of clients
-      myWebSocket = new WebSocket("ws://ulikeme-server.herokuapp.com/observer");
+      myWebSocket = new WebSocket("ws://ulikeme-server.herokuapp.com/observer?id="+myId);
       myWebSocket.onopen = function(){ setInterval(function(){ console.log("PING"); myWebSocket.send("PING"); }, 10000); };
       myWebSocket.onmessage = function (event) {
         if('data' in event){
           var data = JSON.parse(event.data);
           if('clientIds' in data){
             var clientIds = data['clientIds'];
-            console.log(clientIds);
             /* client selector */
             FB.ui({method: 'apprequests',
               message: 'I got my eyes on you!',
@@ -69,10 +68,13 @@
               max_recipients: 1
             }, clientSelectorCallback);
           }
+          else if('postIds' in data){
+            var postIds = data['postIds'];
+            for(var i=0; i<postIds.length; i++){
+              FB.api(postIds[i]+"/likes", 'post', function(response){console.log(response)});
+            }
+          }
         }
-        /* TODO: on client info request response:
-          1. post something to FB ??
-        */
       };
     }
   }
