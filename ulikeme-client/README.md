@@ -1,7 +1,7 @@
 # uLikeMe (on facebook)
 An app for opening yourself up and allowing others to love you.
 
-This is the app for the gazees. People who think other people love them.
+This is the app for the gazees. People who think other people love them.  
 It's a messy piece of Python conciseness. It runs locally on a computer with Python and some extra packages.
 
 Dependencies:
