@@ -33,7 +33,10 @@ class uLikeMeWebSocketClient(WebSocketClient):
             graph = graphs.queue[0]
             observerId = data['observer']
             observerName = graph.get_object(observerId)['name']
-            print "got request from %s (%s)" % (observerName, observerId)
+            if (isinstance(observerName, unicode)):
+                observerName = observerName.encode('utf-8')
+
+            print "got request from %s (%s)" % (observerName.decode('utf-8'), str(observerId))
             ## TODO: send something back to observer ??
 
 def get_url(path, args=None):
@@ -89,7 +92,7 @@ def loop():
     global userName, userId, observerName, observerId, myWebSocket
     graph = graphs.queue[0]
     if (userName is None):
-        userName = str(graph.get_object("me")['name'])
+        userName = graph.get_object("me")['name'].encode('utf-8')
     if (userId is None):
         userId = int(graph.get_object("me")['id'])
     if(myWebSocket is None):
