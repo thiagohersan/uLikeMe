@@ -138,7 +138,7 @@ def postPicture():
         photo = graph.put_photo(image=imgFile,
                                 message=message,
                                 album_id=int(album['id']),
-                                tags=dumps([{'x':33, 'y':33, 'tag_uid':userId}, {'x':66, 'y':66, 'tag_uid':observerId}]))
+                                tags=dumps([{'x':33, 'y':33, 'tag_uid':userId}]))
         graph.put_object(photo['id'], "likes")
         graph.put_object(photo['post_id'], "likes")
         posts['ids'].append(photo['id'])
