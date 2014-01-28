@@ -5,7 +5,7 @@ from sys import exit, argv
 from os import remove
 from threading import Thread
 from re import match, sub
-from time import time, sleep
+from time import time, sleep, localtime, asctime
 from Queue import PriorityQueue
 from json import dumps, loads
 from xml.dom import minidom
@@ -20,11 +20,16 @@ import webbrowser
 import facebook
 
 class uLikeMeWebSocketClient(WebSocketClient):
+    died = False;
     def opened(self):
+        self.died = False;
         print "WebSocket opened"
+        print asctime(localtime(time()))
 
     def closed(self, code, reason=None):
+        self.died = True
         print "WebSocket closed: %s %s" %(code, reason)
+        print asctime(localtime(time()))
 
     def received_message(self, m):
         global observerName, observerId
@@ -95,7 +100,7 @@ def loop():
         userName = graph.get_object("me")['name'].encode('utf-8')
     if (userId is None):
         userId = int(graph.get_object("me")['id'])
-    if(myWebSocket is None):
+    if((myWebSocket is None) or (myWebSocket.died is True)):
         host = 'ws://ulikeme-server.herokuapp.com/client?id=%s'%(userId)
         myWebSocket = uLikeMeWebSocketClient(host, heartbeat_freq=10)
         myWebSocket.connect()
