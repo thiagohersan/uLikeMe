@@ -29,17 +29,18 @@
   var myWebSocket, myId;
 
   // Load the SDK asynchronously
-  (function(d){
-    var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
-    if (d.getElementById(id)) {return;}
-    js = d.createElement('script'); js.id = id; js.async = true;
-    js.src = "//connect.facebook.net/en_US/all.js";
-    ref.parentNode.insertBefore(js, ref);
-  }(document));
+  (function(d, s, id){
+     var js, fjs = d.getElementsByTagName(s)[0];
+     if (d.getElementById(id)) {return;}
+     js = d.createElement(s); js.id = id;
+     js.src = "//connect.facebook.net/en_US/sdk.js";
+     fjs.parentNode.insertBefore(js, fjs);
+   }(document, 'script', 'facebook-jssdk'));
 
   window.fbAsyncInit = function() {
     FB.init({
       appId      : '499753440145658',
+      version    : 'v2.10',
       status     : true, // check login status
       cookie     : true, // enable cookies to allow the server to access the session
       xfbml      : true  // parse XFBML
@@ -133,7 +134,7 @@
   </div>
 
   <div id="about" class="bottom-links">
-    <a href="http://thiagohersan.com/project/ulikeme-on-facebook/" target="_about">Info</a>
+    <a href="http://thiagohersan.com/project/ulikeme-on-facebook/" target="_blank">Info</a>
   </div>
 
   <div id="post-feedback">
@@ -141,7 +142,7 @@
   </div>
 
   <div id="credit" class="bottom-links">
-    <a href="http://www.thiagohersan.com/" target="_credit">Thiago Hersan</a>
+    <a href="http://www.thiagohersan.com/" target="_blank">Thiago Hersan</a>
   </div>
 
 </body>
