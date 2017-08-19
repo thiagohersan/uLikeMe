@@ -18,7 +18,7 @@
   <meta property="og:title" content="uLikeMe (on Facebook)" />
   <meta property="og:type" content="article" />
   <meta property="og:url" content="http://ulikeme.thiagohersan.com/" />
-  <meta property="og:image" content="http://ulikeme.thiagohersan.com/imgs/uLikeMe500_.png" />
+  <meta property="og:image" content="http://ulikeme.thiagohersan.com/imgs/uLikeMe500.png" />
   <meta property="og:description" content="uLikeMe (on Facebook) is an app for allowing other people to love you (on Facebook)" />
 
 </head>
@@ -55,7 +55,7 @@
   };
 
   function logMeIn(){
-    FB.login(function(){}, {scope: "read_stream,user_likes,publish_actions,publish_stream"});
+    FB.login(function(){}, {scope: "publish_actions"});
   }
   function onLogIn(response) {
     if(('status' in response) && (response.status == 'connected')){
@@ -95,32 +95,36 @@
     }
   }
 
-  function centerFeedback(){
-      $("#post-feedback").css('left', ($(window).width() - $("#post-feedback").width())/2+"px");
+  function centerHoverMap(){
+    var eyeImgWidth = $('#eye-img').width();
+    var eyeImgXOffset = $('#eye-img').offset().left;
+
+    $('#roll-over-area').css('width', eyeImgWidth/4+'px');
+    $('#roll-over-area').css('height', eyeImgWidth/4+'px');
+    $('#roll-over-area').css('top', (eyeImgWidth/2 - eyeImgWidth/8)+'px');
+    $('#roll-over-area').css('left', (eyeImgXOffset + eyeImgWidth/2 - eyeImgWidth/8)+'px');
   }
   function showFeedback(){
-    centerFeedback();
     $("#post-feedback").css('opacity', 1.0);
     setTimeout(function(){ $("#post-feedback").css('opacity', 0.0); }, 2000);
   }
 
-  $(window).load(function(){
+  $(window).load(function() {
+    centerHoverMap();
     $('#roll-over-area').hover(
-      function(){ $('#eye-img').attr("src","imgs/uLikeMe666.png"); },
-      function() { $('#eye-img').attr("src","imgs/uLikeMe666_.png"); }
+      function(){ $('#eye-img').attr("src","imgs/uLikeMe666_S2.png"); },
+      function() { $('#eye-img').attr("src","imgs/uLikeMe666.png"); }
       );
   });
-  $(window).resize(centerFeedback);
+  $(window).resize(centerHoverMap);
 
 
   </script>
 
   <div id="main-body">
     <div id="logo-button">
-      <img id="eye-img" src="imgs/uLikeMe666_.png" usemap="#imgmap" />
-      <map name="imgmap">
-        <area id="roll-over-area" shape="circle" coords="333,333,166" onclick="logMeIn()" >
-      </map>
+      <div id="roll-over-area"></div>
+      <img id="eye-img" src="imgs/uLikeMe666.png">
     </div>
   </div>
 
